@@ -1,0 +1,289 @@
+{
+  "info": {
+    "name": "Healthcare SaaS API - SAMH",
+    "description": "Complete API collection for Healthcare SaaS Patient Management System",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "patientId", "value": "SAMH-10001", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/send-otp",
+            "auth": { "type": "noauth" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"9876543210\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res.data && res.data.otp) {",
+                "  pm.collectionVariables.set('otp', res.data.otp);",
+                "  console.log('OTP saved:', res.data.otp);",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/verify-otp",
+            "auth": { "type": "noauth" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"9876543210\",\n  \"otp\": \"{{otp}}\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res.data && res.data.token) {",
+                "  pm.collectionVariables.set('token', res.data.token);",
+                "  console.log('Token saved');",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login with Patient ID",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "auth": { "type": "noauth" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_id\": \"SAMH-10001\",\n  \"password\": \"123456\"\n}"
+            }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "const res = pm.response.json();",
+                "if (res.data && res.data.token) {",
+                "  pm.collectionVariables.set('token', res.data.token);",
+                "  console.log('Login token saved');",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Patient Registration & Profile",
+      "item": [
+        {
+          "name": "Register Patient",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/patients/register",
+            "auth": { "type": "noauth" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Arun Kumar\",\n  \"mobile\": \"9876543210\",\n  \"gender\": \"Male\",\n  \"dob\": \"1995-08-12\",\n  \"blood_group\": \"O+\",\n  \"address\": \"Chennai, Tamil Nadu\",\n  \"password\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Patient Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/patients/{{patientId}}"
+          }
+        },
+        {
+          "name": "Update Patient Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/patients/{{patientId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address\": \"Anna Nagar, Chennai\",\n  \"bp\": \"130/85\",\n  \"sugar\": \"150\",\n  \"sleep\": 7,\n  \"stress\": 55,\n  \"allergies\": [\"Penicillin\", \"Dust\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "List All Patients",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/patients?page=1&limit=10&search=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "patients"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "search", "value": "" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 Dashboard",
+      "item": [
+        {
+          "name": "Dashboard Home",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/dashboard/home"
+          }
+        },
+        {
+          "name": "Wellness Summary",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/dashboard/wellness"
+          }
+        },
+        {
+          "name": "Notifications",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/dashboard/notifications"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏥 Appointments & Doctors",
+      "item": [
+        {
+          "name": "Get All Doctors",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors?specialization=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doctors"],
+              "query": [{ "key": "specialization", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Get Doctor Slots",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/doctors/1/slots?date=2026-05-30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "doctors", "1", "slots"],
+              "query": [{ "key": "date", "value": "2026-05-30" }]
+            }
+          }
+        },
+        {
+          "name": "Book Appointment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/appointments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient_id\": \"SAMH-10001\",\n  \"doctor_id\": 1,\n  \"date\": \"2026-05-31\",\n  \"slot\": \"11:00 AM\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Queue Tracking",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/appointments/1/queue"
+          }
+        },
+        {
+          "name": "Patient Appointment History",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/appointments/patient/SAMH-10001"
+          }
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/appointments/1/cancel"
+          }
+        }
+      ]
+    },
+    {
+      "name": "💚 Wellness",
+      "item": [
+        {
+          "name": "Log Wellness Data",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/wellness/log",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bp\": \"140/90\",\n  \"sugar\": \"168\",\n  \"sleep\": 7,\n  \"stress\": 62,\n  \"allergies\": [\"Penicillin\", \"Dust\"],\n  \"notes\": \"Feeling slightly tired today\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Wellness History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/wellness/history/SAMH-10001?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "wellness", "history", "SAMH-10001"],
+              "query": [{ "key": "days", "value": "30" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "❤️ Health Check",
+      "item": [
+        {
+          "name": "Server Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health",
+            "auth": { "type": "noauth" }
+          }
+        }
+      ]
+    }
+  ]
+}
